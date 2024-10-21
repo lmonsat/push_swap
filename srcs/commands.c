@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/01 18:17:36 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/15 19:26:02 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/18 22:06:43 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,51 +231,52 @@ void rrr(struct s_stacks **head_a, struct s_stacks **head_b)
 
 void pa(struct s_stacks **head_a, struct s_stacks **head_b)
 {
-	struct s_stacks *new_node_a;
-	struct s_stacks *temp_b;
-	
-	if (*head_b)
-    {
-        new_node_a = malloc(sizeof(struct s_stacks));
-        if (!new_node_a)
-        {
-			ft_printf("Error\n");
-			exit(EXIT_FAILURE);
-		}
-        new_node_a->data = (*head_b)->data;  // Copier la valeur du premier élément de B
-        new_node_a->next = *head_a;          // Ajouter l'ancien head_a comme prochain
+	struct s_stacks *node_to_push;
 
-        *head_a = new_node_a;  // Mettre à jour head_a avec le nouveau nœud
+	if (*head_b == NULL)
+		return;
 
-		temp_b = *head_b;
-        *head_b = (*head_b)->next;  // Mettre à jour head_b pour qu'il pointe sur le prochain élément
-        free(temp_b);
-		ft_printf("pa\n");
-    }
+	// Transférer le nœud de head_a vers head_a
+	node_to_push = *head_b;
+	*head_b = (*head_b)->next;
+
+	// Mettre à jour les pointeurs de head_b
+	if (*head_b != NULL)
+		(*head_b)->prev = NULL;
+
+	// Insérer le nœud en tête de head_a
+	node_to_push->next = *head_a;
+	if (*head_a != NULL)
+		(*head_a)->prev = node_to_push;
+
+	*head_a = node_to_push;
+	node_to_push->prev = NULL;
+
+	ft_printf("pa\n");
 }
 
 void pb(struct s_stacks **head_a, struct s_stacks **head_b)
 {
-	struct s_stacks *new_node_b;
-	struct s_stacks *temp_a;
+	struct s_stacks *node_to_push;
 
-    if (*head_a)
-    {
-        new_node_b = malloc(sizeof(struct s_stacks));
-        if (!new_node_b)
-        {
-			ft_printf("Error\n");
-			exit(EXIT_FAILURE);
-		}
-        new_node_b->data = (*head_a)->data;  // Copier la valeur du premier élément de A
-        new_node_b->next = *head_b;          // Ajouter l'ancien head_b comme prochain
+	if (*head_a == NULL)
+		return;
 
-        *head_b = new_node_b;  // Mettre à jour head_b avec le nouveau nœud
+	// Transférer le nœud de head_a vers head_b
+	node_to_push = *head_a;
+	*head_a = (*head_a)->next;
 
-        // Supprimer le premier élément de la pile A
-		temp_a = *head_a;
-        *head_a = (*head_a)->next;  // Mettre à jour head_a pour qu'il pointe sur le prochain élément
-        free(temp_a);  
-		ft_printf("pb\n");
-    }
+	// Mettre à jour les pointeurs de head_a
+	if (*head_a != NULL)
+		(*head_a)->prev = NULL;
+
+	// Insérer le nœud en tête de head_b
+	node_to_push->next = *head_b;
+	if (*head_b != NULL)
+		(*head_b)->prev = node_to_push;
+
+	*head_b = node_to_push;
+	node_to_push->prev = NULL;
+
+	ft_printf("pb\n");
 }

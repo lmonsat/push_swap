@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 17:06:54 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/14 21:22:44 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/21 00:55:32 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,24 +39,12 @@ void algo_3(struct s_stacks **head)
 	ft_printf("(*head)->next->next->data: %d\n", (*head)->next->next->data);*/
 	if (!is_sorted(head))
 	{
-		if (max == (*head)->data && min == (*head)->next->data)
-		{
+		if ((*head)->data == max)
 			ra(head, 0);
-		}
-		else if (max == (*head)->data)
-		{
-			ra(head, 0);
+		else if ((*head)->next->data == max)
+			rra(head, 0);
+		if ((*head)->data > (*head)->next->data)
 			sa(head, 0);
-		}
-		else if (max == (*head)->next->data)
-		{
-			sa(head, 0);
-			ra(head, 0);
-		}
-		else if (max == (*head)->next->next->data)
-		{
-			sa(head, 0);
-		}
 	}
 }
 
@@ -79,6 +67,7 @@ void algo_4(struct s_stacks **head)
 		}
 		else if (max == (*head)->next->next->data)
 		{
+			//rra(head, 0);
 			rra(head, 0);
 		}
 		last = pop_last(head);

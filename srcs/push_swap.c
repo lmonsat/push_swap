@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 00:37:27 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/18 17:10:07 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/21 02:33:09 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,17 +95,30 @@ struct s_stacks *pop_last(struct s_stacks **head)
 	struct s_stacks *current;
 	struct s_stacks *prev;
 
+	// Si la liste est vide, rien à supprimer
+	if (*head == NULL)
+		return (NULL);
+
 	current = *head;
-	prev = NULL;
+
+	// Si la liste n'a qu'un seul élément
+	if (current->next == NULL)
+	{
+		*head = NULL;  // La liste devient vide
+		return (current);
+	}
+
+	// Parcourir la liste jusqu'à l'avant-dernier élément
 	while (current->next)
 	{
 		prev = current;
 		current = current->next;
 	}
 
-	if (prev)
-		prev->next = NULL;
-	
+	// Supprimer le dernier élément
+	prev->next = NULL;
+	current->prev = NULL;
+
 	return (current);
 }
 
@@ -113,20 +126,40 @@ void push_last(struct s_stacks **head, struct s_stacks *last)
 {
 	struct s_stacks *current;
 
+	// Si la liste est vide, le nouvel élément devient le premier
+	if (*head == NULL)
+	{
+		*head = last;
+		last->next = NULL;
+		last->prev = NULL;
+		return;
+	}
+
 	current = *head;
+
+	// Parcourir jusqu'au dernier élément
 	while (current->next)
 	{
 		current = current->next;
 	}
+
+	// Ajouter le nouvel élément à la fin
 	current->next = last;
+	last->prev = current;  // Mettre à jour le pointeur prev
 	last->next = NULL;
 }
 
+
 int stack_size(struct s_stacks *stack)
 {
-    int size = 0;
-    struct s_stacks *current = stack;
-
+    struct s_stacks *current;
+	int size;
+	
+	if (!stack)
+		return (0);
+	
+	size = 0;
+	current = stack;
     while (current)
     {
         size++;
@@ -228,7 +261,7 @@ void rotate_to_position(struct s_stacks **stack_a, int position)
 
 void move_min_to_top(struct s_stacks **stack_a)
 {
-	struct s_stacks *min;
+	/*struct s_stacks *min;
     int position;
 	
 	min = min_node_in_stack(*stack_a);
@@ -237,7 +270,15 @@ void move_min_to_top(struct s_stacks **stack_a)
     if (position > 0) 
     {
         rotate_to_position(stack_a, position);
-    }
+    }*/
+	struct s_stacks *min;
+	min = min_node_in_stack(*stack_a);
+	if (min->above_median)
+		while (*stack_a != min)
+			ra(stack_a, 0);
+	else
+		while (*stack_a != min)
+			rra(stack_a, 0);
 }
 
 /*void move_min_to_top(struct s_stacks **stack_a) 
@@ -391,9 +432,10 @@ void rotate_stack_a_and_b(struct s_stacks **stack_a, struct s_stacks **stack_b, 
 			//ft_printf("test crash 1, reverse_position : %d\n", reverse_position);
         }
     }
-
-	rotate_stack_a_to_target(stack_a, target_a);
-    rotate_stack_b_to_target(stack_b, target_b);
+	set_current_position(*stack_a);
+	set_current_position(*stack_b);
+	//rotate_stack_a_to_target(stack_a, target_a);
+    //rotate_stack_b_to_target(stack_b, target_b);
 }
 
 struct s_stacks *find_target_node_old(struct s_stacks *stack_a, int value)
@@ -523,7 +565,7 @@ int calculate_push_cost_old(struct s_stacks *stack_a, struct s_stacks *stack_b, 
     return (cost_a + cost_b);
 }
 
-int calculate_push_cost(struct s_stacks *stack_a, struct s_stacks *stack_b, int value) 
+/*int calculate_push_cost(struct s_stacks *stack_a, struct s_stacks *stack_b, int value) 
 {
 	struct s_stacks *target_b = find_node(stack_b, value);  // Trouve le noeud avec la valeur donnée
 	int position_b = find_position(stack_b, target_b);      // Trouve la position dans stack_b
@@ -545,9 +587,9 @@ int calculate_push_cost(struct s_stacks *stack_a, struct s_stacks *stack_b, int 
 		push_cost += size_a - target_position;  // Rotation vers le bas (rra)
 
 	return (push_cost);
-}
+}*/
 
-/*int calculate_push_cost(struct s_stacks *stack_a, struct s_stacks *stack_b, int value) 
+int calculate_push_cost(struct s_stacks *stack_a, struct s_stacks *stack_b, int value) 
 {
 	struct s_stacks *target_a = find_node(stack_a, value);  // Trouve le noeud avec la valeur donnée dans stack_a
 	int position_b = find_position(stack_b, find_node(stack_b, value));  // Trouve la position de 'value' dans stack_b
@@ -569,8 +611,7 @@ int calculate_push_cost(struct s_stacks *stack_a, struct s_stacks *stack_b, int 
 		push_cost += size_a - target_position;  // Rotation vers le bas (rra)
 
 	return (push_cost);
-}*/
-
+}
 
 
 /*struct s_stacks *find_cheapest_to_push(struct s_stacks *stack_a, struct s_stacks *stack_b) 
@@ -598,32 +639,6 @@ int calculate_push_cost(struct s_stacks *stack_a, struct s_stacks *stack_b, int 
 	}
     return (best_match_node);  // Retourner l'élément avec le coût minimum
 }*/
-
-struct s_stacks *find_cheapest_to_push_a(struct s_stacks *stack_a, struct s_stacks *stack_b) 
-{
-    long			best_match_value;
-	struct s_stacks *best_match_node = NULL;
-
-	// Si stack_b est vide, on ne fait rien
-	if (stack_b == NULL)
-		return (NULL);
-
-	best_match_value = LONG_MAX;
-	while (stack_b)
-	{
-		// Calculer le coût de pousser cet élément de stack_b vers stack_a
-		int push_cost = calculate_push_cost(stack_a, stack_b, stack_b->data);
-
-		// Comparer avec le meilleur coût trouvé jusqu'à présent
-		if (push_cost < best_match_value)
-		{
-			best_match_value = push_cost;
-			best_match_node = stack_b;
-		}
-		stack_b = stack_b->next;  // Avancer dans stack_b
-	}
-    return (best_match_node);  // Retourner l'élément avec le coût minimum
-}
 
 
 /*struct s_stacks *find_cheapest_to_push_old(struct s_stacks *stack_a, struct s_stacks *stack_b) 
@@ -663,6 +678,32 @@ struct s_stacks *find_cheapest_to_push_a(struct s_stacks *stack_a, struct s_stac
     pb(stack_a, stack_b);
 }*/
 
+struct s_stacks *find_cheapest_to_push_a(struct s_stacks *stack_a, struct s_stacks *stack_b) 
+{
+    long			best_match_value;
+	struct s_stacks *best_match_node = NULL;
+
+	// Si stack_b est vide, on ne fait rien
+	if (stack_b == NULL)
+		return (NULL);
+
+	best_match_value = LONG_MAX;
+	while (stack_b)
+	{
+		// Calculer le coût de pousser cet élément de stack_b vers stack_a
+		int push_cost = calculate_push_cost(stack_a, stack_b, stack_b->data);
+
+		// Comparer avec le meilleur coût trouvé jusqu'à présent
+		if (push_cost < best_match_value)
+		{
+			best_match_value = push_cost;
+			best_match_node = stack_b;
+		}
+		stack_b = stack_b->next;  // Avancer dans stack_b
+	}
+    return (best_match_node);  // Retourner l'élément avec le coût minimum
+}
+
 void push_cheapest_to_a(struct s_stacks **stack_a, struct s_stacks **stack_b) 
 {
     struct s_stacks *cheapest = find_cheapest_to_push_a(*stack_a, *stack_b);
@@ -675,29 +716,237 @@ void push_cheapest_to_a(struct s_stacks **stack_a, struct s_stacks **stack_b)
     rotate_stack_a_and_b(stack_a, stack_b, target_a, target_b);
 
     // Ajuster les rotations individuelles avant de pousser
-    rotate_stack_a_to_target(stack_a, target_a);
-    rotate_stack_b_to_target(stack_b, target_b);
+    //rotate_stack_a_to_target(stack_a, target_a);
+    //rotate_stack_b_to_target(stack_b, target_b);
+
+	finish_rotation(stack_b, cheapest, 'b');
+	finish_rotation(stack_a, find_target_node(*stack_a, cheapest), 'a');
     
     // Pousser dans STACK_A
     pa(stack_a, stack_b);
 }
 
+void	set_current_position(struct s_stacks *stack)
+{
+	int	i;
+	int	centerline;
+
+	i = 0;
+	if (NULL == stack)
+		return ;
+	centerline = stack_size(stack) / 2;
+	while (stack)
+	{
+		stack->current_position = i;
+		if (i <= centerline)
+			stack->above_median = 1;
+		else
+			stack->above_median = 0;
+		stack = stack->next;
+		++i;
+	}
+}
+
+/*
+ *	Best match is..
+ *   | "The Smallest-bigger value" |
+ *
+ *  if no node is Bigger, best_match is the Smallest node.
+ *  TLDR 
+ *  With this function every node in b gets its target node in a
+*/
+static void	set_target_node(struct s_stacks *stack_a, struct s_stacks *stack_b)
+{
+	struct s_stacks *current_a;
+	struct s_stacks *target_node;
+	long			best_match_index;
+
+	while (stack_b)
+	{
+		best_match_index = LONG_MAX;
+		current_a = stack_a;
+		while (current_a)
+		{
+			if (current_a->data > stack_b->data && current_a->data < best_match_index)
+			{
+				best_match_index = current_a->data;
+				target_node = current_a;
+			}
+			current_a = current_a->next;
+		}
+		if (LONG_MAX == best_match_index)
+			stack_b->target_node = min_node_in_stack(stack_a);
+		else
+			stack_b->target_node = target_node;
+		stack_b = stack_b->next;
+	}
+}
+
+/*
+ * Set the prices to push the node
+ * from b -> a
+ * The price checks for the relative positions in the stack
+ * for every node, setting the respective price
+*/
+void	set_price(struct s_stacks *stack_a, struct s_stacks *stack_b)
+{
+	int	size_a;
+	int	size_b;
+
+	size_a = stack_size(stack_a);
+	size_b = stack_size(stack_b);
+	while (stack_b)
+	{
+		stack_b->push_cost = stack_b->current_position;
+		if (!(stack_b->above_median))
+			stack_b->push_cost = size_b - (stack_b->current_position);
+		if (stack_b->target_node->above_median)
+			stack_b->push_cost += stack_b->target_node->current_position;
+		else
+			stack_b->push_cost += size_a - (stack_b->target_node->current_position);
+		stack_b = stack_b->next;
+	}
+}
+
+/*
+ * Flag the cheapest node in the current
+ * stacks configurations
+*/
+void	set_cheapest(struct s_stacks *stack_b)
+{
+	long			best_match_value;
+	struct s_stacks	*best_match_node;
+
+	if (stack_b == NULL)
+		return ;
+	best_match_value = LONG_MAX;
+	best_match_node = NULL;
+	while (stack_b)
+	{
+		if (stack_b->push_cost < best_match_value)
+		{
+			best_match_value = stack_b->push_cost;
+			best_match_node = stack_b;
+		}
+		stack_b = stack_b->next;
+	}
+	if (best_match_node)
+		best_match_node->cheapest = 1;
+}
+
+struct s_stacks *return_cheapest(struct s_stacks *stack)
+{
+	if (NULL == stack)
+		return (NULL);
+	while (stack)
+	{
+		if (stack->cheapest)
+			return (stack);
+		stack = stack->next;
+	}
+	return (NULL);
+}
+
+/*
+ * All the necessary values to make the push
+ * 		~Relative Positions
+ * 		~Target node, the b node to make emerge
+ * 		~Price for every configuration
+ * 		~Cheapest in the current configuration
+*/
+void	init_nodes(struct s_stacks *stack_a, struct s_stacks *stack_b)
+{
+	set_current_position(stack_a);
+	set_current_position(stack_b);
+	set_target_node(stack_a, stack_b);
+	set_price(stack_a, stack_b);
+	set_cheapest(stack_b);
+}
+
+static void	rotate_both(struct s_stacks **stack_a, struct s_stacks **stack_b, struct s_stacks *cheapest_node)
+{
+	while (*stack_a != cheapest_node->target_node && *stack_b != cheapest_node)
+		rr(stack_a, stack_b);
+	set_current_position(*stack_a);
+	set_current_position(*stack_b);
+}
+
+static void	reverse_rotate_both(struct s_stacks **stack_a, struct s_stacks **stack_b, struct s_stacks *cheapest_node)
+{
+	while (*stack_a != cheapest_node->target_node && *stack_b != cheapest_node)
+		rrr(stack_a, stack_b);
+
+	set_current_position(*stack_a);
+	set_current_position(*stack_b);
+}
+
+/*
+ * Conclude the rotation of the stacks 
+*/
+void	finish_rotation(struct s_stacks **stack, struct s_stacks *top_node, char stack_name)
+{
+	while (*stack != top_node)
+	{
+		if (stack_name == 'a')
+		{
+			if (top_node->above_median)
+				ra(stack, 0);
+			else
+				rra(stack, 0);
+		}
+		else if (stack_name == 'b')
+		{
+			if (top_node->above_median)
+				rb(stack, 0);
+			else
+				rrb(stack, 0);
+		}	
+	}
+}
+
 void rush_b(struct s_stacks **stack_a, struct s_stacks **stack_b) 
 {
-    while (stack_size(*stack_a) > 3) 
+	int size;
+	
+	size = stack_size(*stack_a);
+    while (size-- > 3) 
 	{
         pb(stack_a, stack_b);
     }
+}
+
+static void	move_nodes(struct s_stacks **stack_a, struct s_stacks **stack_b)
+{
+	struct s_stacks	*cheapest_node;
+
+	cheapest_node = return_cheapest(*stack_b);
+	
+	/*if (cheapest_node->above_median && cheapest_node->target_node->above_median)
+		rotate_both(stack_a, stack_b, cheapest_node);
+
+	else if (!(cheapest_node->above_median) && !(cheapest_node->target_node->above_median))
+		reverse_rotate_both(stack_a, stack_b, cheapest_node);*/
+
+	rotate_stack_a_and_b(stack_a, stack_b, (*stack_a)->target_node, (*stack_b)->target_node);
+
+
+	finish_rotation(stack_b, cheapest_node, 'b');
+	finish_rotation(stack_a, cheapest_node->target_node, 'a');
+	pa(stack_a, stack_b);
 }
 
 void rush_a(struct s_stacks **stack_a, struct s_stacks **stack_b) 
 {
     while (*stack_b) 
 	{
+		set_current_position(stack_a);
+		set_current_position(stack_b);
         /*struct s_stacks *target_in_a = find_target_node(*stack_a, *stack_b);
         rotate_stack_a_to_target(stack_a, target_in_a);
         pa(stack_a, stack_b);*/
 		push_cheapest_to_a(stack_a, stack_b);
+		//init_nodes(*stack_a, *stack_b);
+		//move_nodes(stack_a, stack_b);
     }
 }
 
@@ -707,6 +956,7 @@ void algo_plus(struct s_stacks **stack_a, struct s_stacks **stack_b, struct s_st
 	rush_b(stack_a, stack_b);
     algo_3(stack_a);
     rush_a(stack_a, stack_b);
+	set_current_position(*stack_a);
     move_min_to_top(stack_a);
 }
 
@@ -722,11 +972,13 @@ void algorithmes(struct s_stacks **head_a, struct s_stacks **head_b, struct s_st
 	}
 	else if (value->numbers_in_stack == 4)
 	{
-		algo_4(head_a);
+		//algo_4(head_a);
+		algo_plus(head_a, head_b, value);
 	}
 	else if (value->numbers_in_stack == 5)
 	{
-		algo_5(head_a);
+		//algo_5(head_a);
+		algo_plus(head_a, head_b, value);
 	}
 	else
 	{
@@ -758,8 +1010,8 @@ int main(int argc, char *argv[])
 	check_input_errors(argc, argv, &stacks);
 	check_numbers(&stacks);
 	fill_stack_a(&head_a, &stacks);
-	//print_stack_a(head_a);
-	//print_stack_b(head_b);
+	print_stack_a(head_a);
+	print_stack_b(head_b);
 	//ft_printf("Check stack size : %d\n", stack_size(head_a));
 	//check_sorted(&head_a);
 	algorithmes(&head_a, &head_b, &stacks);

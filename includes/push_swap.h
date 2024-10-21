@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 00:38:03 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/18 17:09:40 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/21 01:26:06 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,17 +22,20 @@
 
 struct s_stacks
 {
-	int	data;
+	
 	struct s_stacks	*next;
 	struct s_stacks	*prev;
+	struct s_stacks *target_node;
 	char **numbers;
 	char **split_numbers;
+	int	data;
 	int is_string_numbers;
 	int numbers_in_stack;
 	int current_position;
-	struct s_stacks *target_node;
+	int cheapest;
 	int above_median;
 	int push_cost;
+
 };
 
 int	ft_strcmp(char *s1, char *s2);

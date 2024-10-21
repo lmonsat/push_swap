@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 03:09:36 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/15 19:18:52 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/21 01:24:25 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ int	is_valid_int(char *str)
 
 	len = ft_strlen(str);
 	int_max_str = "2147483647";
-	int_min_str = "-2147483647";
+	int_min_str = "-2147483648";
 	if (str[0] == '-')
 	{
 		if (len > ft_strlen(int_min_str))
