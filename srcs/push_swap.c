@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 00:37:27 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/21 02:33:09 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/21 21:55:51 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,6 +191,64 @@ int find_position(struct s_stacks *stack, struct s_stacks *target)
         current = current->next;
     }
     return (-1);
+}
+
+void	set_current_position(struct s_stacks *stack)
+{
+	int	i;
+	int	centerline;
+
+	i = 0;
+	if (NULL == stack)
+		return ;
+	centerline = stack_size(stack) / 2;
+	while (stack)
+	{
+		stack->current_position = i;
+		if (i <= centerline)
+			stack->above_median = 1;
+		else
+			stack->above_median = 0;
+		stack = stack->next;
+		++i;
+	}
+}
+
+/*
+ * Conclude the rotation of the stacks 
+*/
+void	finish_rotation(struct s_stacks **stack, struct s_stacks *top_node, char stack_name)
+{
+	while (*stack != top_node)
+	{
+		if (stack_name == 'a')
+		{
+			if (top_node->above_median)
+				ra(stack, 0);
+			else
+				rra(stack, 0);
+		}
+		else if (stack_name == 'b')
+		{
+			if (top_node->above_median)
+				rb(stack, 0);
+			else
+				rrb(stack, 0);
+		}	
+	}
+}
+
+struct s_stacks *return_cheapest(struct s_stacks *stack)
+{
+	if (NULL == stack)
+		return (NULL);
+	while (stack)
+	{
+		if (stack->cheapest)
+			return (stack);
+		stack = stack->next;
+	}
+	return (NULL);
 }
 
 struct s_stacks *min_node_in_stack(struct s_stacks *stack)
@@ -389,7 +447,7 @@ void rotate_stack_b_to_target(struct s_stacks **stack_b, struct s_stacks *target
     }
 }
 
-void rotate_stack_a_and_b(struct s_stacks **stack_a, struct s_stacks **stack_b, struct s_stacks *target_a, struct s_stacks *target_b)
+void rotate_stack_a_and_b(struct s_stacks **stack_a, struct s_stacks **stack_b, struct s_stacks *cheapest_node)
 {
 	int position_a;
 	int position_b;
@@ -398,8 +456,8 @@ void rotate_stack_a_and_b(struct s_stacks **stack_a, struct s_stacks **stack_b, 
     int size_a;
 	int size_b;
 	
-	position_a = find_position(*stack_a, target_a);
-	position_b = find_position(*stack_b, target_b);
+	position_a = find_position(*stack_a, (*stack_a)->target_node);
+	position_b = find_position(*stack_b, (*stack_b)->target_node);
 	size_a = stack_size(*stack_a);
 	size_b = stack_size(*stack_b);
 
@@ -589,26 +647,26 @@ int calculate_push_cost_old(struct s_stacks *stack_a, struct s_stacks *stack_b, 
 	return (push_cost);
 }*/
 
+
 int calculate_push_cost(struct s_stacks *stack_a, struct s_stacks *stack_b, int value) 
 {
-	struct s_stacks *target_a = find_node(stack_a, value);  // Trouve le noeud avec la valeur donnée dans stack_a
-	int position_b = find_position(stack_b, find_node(stack_b, value));  // Trouve la position de 'value' dans stack_b
-	int target_position = find_position(stack_a, find_target_node(stack_a, find_node(stack_b, value)));  // Trouve la position cible dans stack_a
+	struct s_stacks *node_b = find_node(stack_b, value);  // Trouver le noeud correspondant dans stack_b
+	struct s_stacks *target_node = node_b->target_node;   // Utiliser directement le target_node
 	int size_a = stack_size(stack_a);
 	int size_b = stack_size(stack_b);
 	int push_cost;
 
 	// Calcul du coût pour les rotations dans stack_b
-	if (position_b <= size_b / 2)
-		push_cost = position_b;  // Rotation vers le haut (rb)
+	if (node_b->current_position <= size_b / 2)
+		push_cost = node_b->current_position;  // Rotation vers le haut (rb)
 	else
-		push_cost = size_b - position_b;  // Rotation vers le bas (rrb)
-
-	// Calcul du coût pour les rotations dans stack_a
-	if (target_position <= size_a / 2)
-		push_cost += target_position;  // Rotation vers le haut (ra)
+		push_cost = size_b - node_b->current_position;  // Rotation vers le bas (rrb)
+	ft_printf("test current_pos : %d\n", node_b->current_position);
+	// Calcul du coût pour les rotations dans stack_a (en fonction du target_node)
+	if (target_node->current_position <= size_a / 2)
+		push_cost += target_node->current_position;  // Rotation vers le haut (ra)
 	else
-		push_cost += size_a - target_position;  // Rotation vers le bas (rra)
+		push_cost += size_a - target_node->current_position;  // Rotation vers le bas (rra)
 
 	return (push_cost);
 }
@@ -690,13 +748,10 @@ struct s_stacks *find_cheapest_to_push_a(struct s_stacks *stack_a, struct s_stac
 	best_match_value = LONG_MAX;
 	while (stack_b)
 	{
-		// Calculer le coût de pousser cet élément de stack_b vers stack_a
-		int push_cost = calculate_push_cost(stack_a, stack_b, stack_b->data);
-
 		// Comparer avec le meilleur coût trouvé jusqu'à présent
-		if (push_cost < best_match_value)
+		if (stack_b->push_cost < best_match_value)
 		{
-			best_match_value = push_cost;
+			best_match_value = stack_b->push_cost;
 			best_match_node = stack_b;
 		}
 		stack_b = stack_b->next;  // Avancer dans stack_b
@@ -706,46 +761,35 @@ struct s_stacks *find_cheapest_to_push_a(struct s_stacks *stack_a, struct s_stac
 
 void push_cheapest_to_a(struct s_stacks **stack_a, struct s_stacks **stack_b) 
 {
-    struct s_stacks *cheapest = find_cheapest_to_push_a(*stack_a, *stack_b);
-    
+    struct s_stacks *cheapest;
+	
+	(*stack_a)->target_node = find_target_node(*stack_a, cheapest);
+	//(*stack_b)->target_node = find_target_node(*stack_b, cheapest);
+	
+	
+	cheapest = find_cheapest_to_push_a(*stack_a, *stack_b);
+	cheapest->target_node = find_target_node(*stack_a, cheapest);
     // Trouver les cibles dans chaque pile
-    struct s_stacks *target_a = find_target_node(*stack_a, cheapest);
-    struct s_stacks *target_b = find_target_node_in_b(*stack_a, *stack_b);
+    //struct s_stacks *target_a = find_target_node(*stack_a, cheapest);
+    //struct s_stacks *target_b = find_target_node_in_b(*stack_a, *stack_b);
 
     // Effectuer les rotations simultanées si possible
-    rotate_stack_a_and_b(stack_a, stack_b, target_a, target_b);
+    rotate_stack_a_and_b(stack_a, stack_b, cheapest);
 
     // Ajuster les rotations individuelles avant de pousser
     //rotate_stack_a_to_target(stack_a, target_a);
     //rotate_stack_b_to_target(stack_b, target_b);
 
 	finish_rotation(stack_b, cheapest, 'b');
-	finish_rotation(stack_a, find_target_node(*stack_a, cheapest), 'a');
+	finish_rotation(stack_a, cheapest->target_node, 'a');
     
     // Pousser dans STACK_A
     pa(stack_a, stack_b);
 }
 
-void	set_current_position(struct s_stacks *stack)
-{
-	int	i;
-	int	centerline;
 
-	i = 0;
-	if (NULL == stack)
-		return ;
-	centerline = stack_size(stack) / 2;
-	while (stack)
-	{
-		stack->current_position = i;
-		if (i <= centerline)
-			stack->above_median = 1;
-		else
-			stack->above_median = 0;
-		stack = stack->next;
-		++i;
-	}
-}
+
+
 
 /*
  *	Best match is..
@@ -834,19 +878,6 @@ void	set_cheapest(struct s_stacks *stack_b)
 		best_match_node->cheapest = 1;
 }
 
-struct s_stacks *return_cheapest(struct s_stacks *stack)
-{
-	if (NULL == stack)
-		return (NULL);
-	while (stack)
-	{
-		if (stack->cheapest)
-			return (stack);
-		stack = stack->next;
-	}
-	return (NULL);
-}
-
 /*
  * All the necessary values to make the push
  * 		~Relative Positions
@@ -860,7 +891,7 @@ void	init_nodes(struct s_stacks *stack_a, struct s_stacks *stack_b)
 	set_current_position(stack_b);
 	set_target_node(stack_a, stack_b);
 	set_price(stack_a, stack_b);
-	set_cheapest(stack_b);
+	//set_cheapest(stack_b);
 }
 
 static void	rotate_both(struct s_stacks **stack_a, struct s_stacks **stack_b, struct s_stacks *cheapest_node)
@@ -880,30 +911,6 @@ static void	reverse_rotate_both(struct s_stacks **stack_a, struct s_stacks **sta
 	set_current_position(*stack_b);
 }
 
-/*
- * Conclude the rotation of the stacks 
-*/
-void	finish_rotation(struct s_stacks **stack, struct s_stacks *top_node, char stack_name)
-{
-	while (*stack != top_node)
-	{
-		if (stack_name == 'a')
-		{
-			if (top_node->above_median)
-				ra(stack, 0);
-			else
-				rra(stack, 0);
-		}
-		else if (stack_name == 'b')
-		{
-			if (top_node->above_median)
-				rb(stack, 0);
-			else
-				rrb(stack, 0);
-		}	
-	}
-}
-
 void rush_b(struct s_stacks **stack_a, struct s_stacks **stack_b) 
 {
 	int size;
@@ -921,13 +928,13 @@ static void	move_nodes(struct s_stacks **stack_a, struct s_stacks **stack_b)
 
 	cheapest_node = return_cheapest(*stack_b);
 	
-	/*if (cheapest_node->above_median && cheapest_node->target_node->above_median)
+	if (cheapest_node->above_median && cheapest_node->target_node->above_median)
 		rotate_both(stack_a, stack_b, cheapest_node);
 
 	else if (!(cheapest_node->above_median) && !(cheapest_node->target_node->above_median))
-		reverse_rotate_both(stack_a, stack_b, cheapest_node);*/
+		reverse_rotate_both(stack_a, stack_b, cheapest_node);
 
-	rotate_stack_a_and_b(stack_a, stack_b, (*stack_a)->target_node, (*stack_b)->target_node);
+	//rotate_stack_a_and_b(stack_a, stack_b, cheapest_node);
 
 
 	finish_rotation(stack_b, cheapest_node, 'b');
@@ -939,11 +946,11 @@ void rush_a(struct s_stacks **stack_a, struct s_stacks **stack_b)
 {
     while (*stack_b) 
 	{
-		set_current_position(stack_a);
-		set_current_position(stack_b);
         /*struct s_stacks *target_in_a = find_target_node(*stack_a, *stack_b);
         rotate_stack_a_to_target(stack_a, target_in_a);
         pa(stack_a, stack_b);*/
+		init_nodes(*stack_a, *stack_b);
+
 		push_cheapest_to_a(stack_a, stack_b);
 		//init_nodes(*stack_a, *stack_b);
 		//move_nodes(stack_a, stack_b);
