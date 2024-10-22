@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 00:37:27 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/21 21:55:51 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/22 21:09:53 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -522,7 +522,7 @@ struct s_stacks *find_target_node_old(struct s_stacks *stack_a, int value)
     return (target);
 }
 
-struct s_stacks *find_target_node(struct s_stacks *stack_a, struct s_stacks *stack_b)
+/*struct s_stacks *find_target_node(struct s_stacks *stack_a, struct s_stacks *stack_b)
 {
 	struct s_stacks *current_a;
 	struct s_stacks *target_node;
@@ -551,7 +551,46 @@ struct s_stacks *find_target_node(struct s_stacks *stack_a, struct s_stacks *sta
 
 	// Retourne le nœud cible trouvé
 	return (target_node);
+}*/
+
+struct s_stacks *find_target_node(struct s_stacks *stack_a, struct s_stacks *stack_b)
+{
+	struct s_stacks *current_a;
+	struct s_stacks *target_node;
+	struct s_stacks *max_node;
+	long target_value;
+
+	// Initialisation du meilleur match
+	target_value = LONG_MAX;
+	target_node = NULL;
+	max_node = NULL;
+
+	// Boucle sur la pile a pour trouver le meilleur match
+	current_a = stack_a;
+	while (current_a)
+	{
+		// On stocke le plus grand élément dans la pile A
+		if (max_node == NULL || current_a->data > max_node->data)
+			max_node = current_a;
+
+		// Chercher un noeud dans a dont la valeur est supérieure à celle de b mais la plus proche possible
+		if (current_a->data > stack_b->data && current_a->data < target_value)
+		{
+			target_value = current_a->data;
+			target_node = current_a;
+		}
+		current_a = current_a->next;
+	}
+
+	// Si aucun match n'a été trouvé (cheapest plus petit que tous les éléments de A),
+	// on doit placer le cheapest après le plus grand élément (max_node).
+	if (target_node == NULL)
+		return (max_node);  // Positionner après le plus grand élément de A
+
+	// Retourne le nœud cible trouvé
+	return (target_node);
 }
+
 
 struct s_stacks *find_target_node_in_b(struct s_stacks *stack_a, struct s_stacks *stack_b)
 {
@@ -736,61 +775,6 @@ int calculate_push_cost(struct s_stacks *stack_a, struct s_stacks *stack_b, int 
     pb(stack_a, stack_b);
 }*/
 
-struct s_stacks *find_cheapest_to_push_a(struct s_stacks *stack_a, struct s_stacks *stack_b) 
-{
-    long			best_match_value;
-	struct s_stacks *best_match_node = NULL;
-
-	// Si stack_b est vide, on ne fait rien
-	if (stack_b == NULL)
-		return (NULL);
-
-	best_match_value = LONG_MAX;
-	while (stack_b)
-	{
-		// Comparer avec le meilleur coût trouvé jusqu'à présent
-		if (stack_b->push_cost < best_match_value)
-		{
-			best_match_value = stack_b->push_cost;
-			best_match_node = stack_b;
-		}
-		stack_b = stack_b->next;  // Avancer dans stack_b
-	}
-    return (best_match_node);  // Retourner l'élément avec le coût minimum
-}
-
-void push_cheapest_to_a(struct s_stacks **stack_a, struct s_stacks **stack_b) 
-{
-    struct s_stacks *cheapest;
-	
-	(*stack_a)->target_node = find_target_node(*stack_a, cheapest);
-	//(*stack_b)->target_node = find_target_node(*stack_b, cheapest);
-	
-	
-	cheapest = find_cheapest_to_push_a(*stack_a, *stack_b);
-	cheapest->target_node = find_target_node(*stack_a, cheapest);
-    // Trouver les cibles dans chaque pile
-    //struct s_stacks *target_a = find_target_node(*stack_a, cheapest);
-    //struct s_stacks *target_b = find_target_node_in_b(*stack_a, *stack_b);
-
-    // Effectuer les rotations simultanées si possible
-    rotate_stack_a_and_b(stack_a, stack_b, cheapest);
-
-    // Ajuster les rotations individuelles avant de pousser
-    //rotate_stack_a_to_target(stack_a, target_a);
-    //rotate_stack_b_to_target(stack_b, target_b);
-
-	finish_rotation(stack_b, cheapest, 'b');
-	finish_rotation(stack_a, cheapest->target_node, 'a');
-    
-    // Pousser dans STACK_A
-    pa(stack_a, stack_b);
-}
-
-
-
-
-
 /*
  *	Best match is..
  *   | "The Smallest-bigger value" |
@@ -852,6 +836,113 @@ void	set_price(struct s_stacks *stack_a, struct s_stacks *stack_b)
 	}
 }
 
+struct s_stacks *find_cheapest_to_push_a(struct s_stacks *stack_a, struct s_stacks *stack_b) 
+{
+    long			best_match_value;
+	struct s_stacks *best_match_node = NULL;
+
+	// Si stack_b est vide, on ne fait rien
+	if (stack_b == NULL)
+		return (NULL);
+	
+	best_match_value = LONG_MAX;
+	while (stack_b)
+	{
+		// Comparer avec le meilleur coût trouvé jusqu'à présent
+		if (stack_b->push_cost < best_match_value)
+		{
+			best_match_value = stack_b->push_cost;
+			best_match_node = stack_b;
+		}
+		stack_b = stack_b->next;  // Avancer dans stack_b
+	}
+    return (best_match_node);  // Retourner l'élément avec le coût minimum
+}
+
+/*void push_cheapest_to_a(struct s_stacks **stack_a, struct s_stacks **stack_b) 
+{
+    struct s_stacks *cheapest;
+	
+	set_target_node(*stack_a,*stack_b);
+	set_price(*stack_a, *stack_b);
+	cheapest = find_cheapest_to_push_a(*stack_a, *stack_b);
+	//(*stack_a)->target_node = find_target_node(*stack_a, cheapest);
+	//(*stack_b)->target_node = find_target_node(*stack_b, cheapest);
+	cheapest->target_node = find_target_node(*stack_a, cheapest);
+
+    // Trouver les cibles dans chaque pile
+    //struct s_stacks *target_a = find_target_node(*stack_a, cheapest);
+    //struct s_stacks *target_b = find_target_node_in_b(*stack_a, *stack_b);
+
+    // Effectuer les rotations simultanées si possible
+    rotate_stack_a_and_b(stack_a, stack_b, cheapest);
+
+    // Ajuster les rotations individuelles avant de pousser
+    //rotate_stack_a_to_target(stack_a, target_a);
+    //rotate_stack_b_to_target(stack_b, target_b);
+
+	finish_rotation(stack_b, cheapest, 'b');
+	finish_rotation(stack_a, cheapest->target_node, 'a');
+    
+    // Pousser dans STACK_A
+    pa(stack_a, stack_b);
+}*/
+
+int find_push_cost(struct s_stacks *stack_a, struct s_stacks *node_b)
+{
+	int	size_a = stack_size(stack_a);
+	int	size_b = stack_size(node_b);
+	int push_cost;
+
+	// Calculer le coût initial en fonction de la position actuelle dans stack_b
+	push_cost = node_b->current_position;
+	if (!(node_b->above_median))
+		push_cost = size_b - (node_b->current_position);
+
+	// Ajouter le coût pour atteindre la cible dans stack_a
+	struct s_stacks *target_node = find_target_node(stack_a, node_b);
+	if (target_node->above_median)
+		push_cost += target_node->current_position;
+	else
+		push_cost += size_a - (target_node->current_position);
+
+	return push_cost;
+}
+
+
+void push_cheapest_to_a(struct s_stacks **stack_a, struct s_stacks **stack_b) 
+{
+	struct s_stacks *cheapest;
+	struct s_stacks *node_b;
+
+	// Initialiser le coût de chaque nœud dans stack_b
+	node_b = *stack_b;
+	while (node_b)
+	{
+		node_b->push_cost = find_push_cost(*stack_a, node_b);
+		node_b = node_b->next;
+	}
+
+	// Trouver le nœud avec le coût le plus bas
+	cheapest = find_cheapest_to_push_a(*stack_a, *stack_b);
+
+	// Assigner le nœud cible pour le nœud le moins coûteux
+	cheapest->target_node = find_target_node(*stack_a, cheapest);
+
+	// Effectuer les rotations simultanées si possible
+	rotate_stack_a_and_b(stack_a, stack_b, cheapest);
+
+	// Ajuster les rotations individuelles avant de pousser
+	finish_rotation(stack_b, cheapest, 'b');
+	finish_rotation(stack_a, cheapest->target_node, 'a');
+
+	// Pousser dans STACK_A
+	pa(stack_a, stack_b);
+}
+
+
+
+
 /*
  * Flag the cheapest node in the current
  * stacks configurations
@@ -890,7 +981,7 @@ void	init_nodes(struct s_stacks *stack_a, struct s_stacks *stack_b)
 	set_current_position(stack_a);
 	set_current_position(stack_b);
 	set_target_node(stack_a, stack_b);
-	set_price(stack_a, stack_b);
+	//set_price(stack_a, stack_b);
 	//set_cheapest(stack_b);
 }
 
@@ -949,8 +1040,8 @@ void rush_a(struct s_stacks **stack_a, struct s_stacks **stack_b)
         /*struct s_stacks *target_in_a = find_target_node(*stack_a, *stack_b);
         rotate_stack_a_to_target(stack_a, target_in_a);
         pa(stack_a, stack_b);*/
-		init_nodes(*stack_a, *stack_b);
-
+		set_current_position(*stack_a);
+		set_current_position(*stack_b);
 		push_cheapest_to_a(stack_a, stack_b);
 		//init_nodes(*stack_a, *stack_b);
 		//move_nodes(stack_a, stack_b);
@@ -959,7 +1050,6 @@ void rush_a(struct s_stacks **stack_a, struct s_stacks **stack_b)
 
 void algo_plus(struct s_stacks **stack_a, struct s_stacks **stack_b, struct s_stacks *value)
 {
-    //push_first(stack_a, stack_b);
 	rush_b(stack_a, stack_b);
     algo_3(stack_a);
     rush_a(stack_a, stack_b);
