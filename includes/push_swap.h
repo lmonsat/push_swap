@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 00:38:03 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/21 01:26:06 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/23 16:44:17 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,9 +70,11 @@ void algo_4(struct s_stacks **head);
 void algo_5(struct s_stacks **head);
 
 void print_stack_a(struct s_stacks *current);
-struct s_stacks *create_node_a(int data);
 void insert_head_a(struct s_stacks **head, int new_data);
+struct s_stacks *create_node_a(int data);
 struct s_stacks *pop_last(struct s_stacks **head);
 void push_last(struct s_stacks **head, struct s_stacks *last);
+
+
 
 #endif
