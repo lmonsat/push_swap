@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 00:38:03 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/23 16:44:17 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/24 21:06:37 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,9 @@ int is_int(const char *str, struct s_stacks *stack);
 int max_in_stack(struct s_stacks **head);
 int min_in_stack(struct s_stacks **head);
 int stack_size(struct s_stacks *stack);
+int arguments_size(int argc, char *argv[], struct s_stacks *stack);
 
-void alloc_array(struct s_stacks *value);
+void alloc_array(struct s_stacks *value, int size);
 void free_array(char **array);
 void free_multiple_arrays(char **array1, char **array2);
 void free_stack(struct s_stacks *head);

@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 03:09:36 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/21 01:24:25 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/24 17:39:03 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ int	is_int(const char *str, struct s_stacks *stack)
 		return (0);
 	if (*str == '+' || *str == '-')
 		str++;
+	if (!*str)
+		return (0);
 	while (*str)
 	{
 		if (*str == ' ')
@@ -33,8 +35,6 @@ int	is_int(const char *str, struct s_stacks *stack)
 			stack->is_string_numbers = 1;
 			str++;
 		}
-		if (*str == '+' || *str == '-')
-			str++;
 		if (!is_digit(*str))
 			return (0);
 		str++;
@@ -80,7 +80,7 @@ void	check_numbers(struct s_stacks *value)
 	{
 		if (!is_valid_int(value->numbers[i]))
 		{
-			ft_printf("Error\n");
+			write(2, "Error\n", 6);
 			free_array(value->numbers);
 			exit(EXIT_FAILURE);
 		}
@@ -91,7 +91,7 @@ void	check_numbers(struct s_stacks *value)
 			nbr_j = ft_atoi(value->numbers[j]);
 			if (nbr_i == nbr_j)
 			{
-				ft_printf("Error\n");
+				write(2, "Error\n", 6);
 				free_array(value->numbers);
 				exit(EXIT_FAILURE);
 			}

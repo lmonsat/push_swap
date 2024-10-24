@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 17:06:54 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/23 16:36:49 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/24 15:11:05 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,6 @@ void algo_4(struct s_stacks **head)
 		algo_3(head);
 		push_last(head, last);
 	}
-	return ;
 }
 
 void algo_5(struct s_stacks **head)
@@ -103,5 +102,4 @@ void algo_5(struct s_stacks **head)
 		algo_4(head);
 		push_last(head, last);
 	}
-	return ;
 }

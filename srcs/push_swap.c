@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 00:37:27 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/24 05:25:51 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/24 21:14:59 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void check_input_errors(int argc, char *argv[], struct s_stacks *stack)
 		}
 		else
 		{
-			ft_printf("Error\n");
+			write(2, "Error\n", 6);
 			free_array(stack->numbers);
 			exit(EXIT_FAILURE);
 		}
@@ -47,7 +47,7 @@ void arg_count(int argc)
 {
 	if (argc < 2)
 	{
-		ft_printf("Error\n");
+		write(2, "Error\n", 6);
 		exit(EXIT_FAILURE);
 	}
 }
@@ -125,6 +125,7 @@ int find_position(struct s_stacks *stack, struct s_stacks *target)
         position++;
         current = current->next;
     }
+	return (-1);
 }
 
 /* Permet d'attribuer a chaque élement d'un stack sa position dans le stack
@@ -382,7 +383,6 @@ void push_cheapest_to_a(struct s_stacks **stack_a, struct s_stacks **stack_b)
 	
 	cheapest = find_cheapest_to_push_a(*stack_a, *stack_b);
     rotate_stack_a_and_b(stack_a, stack_b, cheapest);
-	
 	ra_rotation(stack_a, cheapest->target_node);
 	rb_rotation(stack_b, cheapest);
     pa(stack_a, stack_b);
@@ -413,11 +413,14 @@ void rush_a(struct s_stacks **stack_a, struct s_stacks **stack_b)
 
 void algo_plus(struct s_stacks **stack_a, struct s_stacks **stack_b, struct s_stacks *value)
 {
-	rush_b(stack_a, stack_b);
-    algo_3(stack_a);
-    rush_a(stack_a, stack_b);
-	update_position(*stack_a);
-    move_min_to_top(stack_a);
+	if (is_sorted(stack_a))
+	{
+		rush_b(stack_a, stack_b);
+		algo_3(stack_a);
+		rush_a(stack_a, stack_b);
+		update_position(*stack_a);
+		move_min_to_top(stack_a);
+	}
 }
 
 void algorithmes(struct s_stacks **head_a, struct s_stacks **head_b, struct s_stacks *value)
@@ -446,6 +449,46 @@ void algorithmes(struct s_stacks **head_a, struct s_stacks **head_b, struct s_st
 	}
 }
 
+int count_split_result(char *argv[], int size, int n)
+{
+	char **split_result;
+	char **tmp_ptr;
+	
+	size--;
+	split_result = ft_split(argv[n], ' ');
+	tmp_ptr = split_result;
+	while (*split_result)
+	{
+		split_result++;
+		size++;
+	}
+	free_array(tmp_ptr);
+	return (size);
+}
+
+int arguments_size(int argc, char *argv[], struct s_stacks *stack)
+{
+	int size;
+	int n;
+
+	size = argc - 1;
+	n = 0;
+	while (argv[++n])
+	{
+		if (is_int(argv[n], stack))
+		{
+			if (stack->is_string_numbers)
+			{
+				if (ft_strchr(argv[n], ' '))
+				{
+					size = count_split_result(argv, size, n);
+				}
+				stack->is_string_numbers = 0;
+			}
+		}
+	}
+	return (size);
+}
 void check_sorted(struct s_stacks **head)
 {
 	if (!is_sorted(head))
@@ -470,21 +513,23 @@ int main(int argc, char *argv[])
 	struct s_stacks stacks;
 	struct s_stacks *head_a;
 	struct s_stacks *head_b;
+	int size;
 
 	head_a = NULL;
-	head_b = NULL;	
+	head_b = NULL;
 	arg_count(argc);
-	alloc_array(&stacks);
+	size = arguments_size(argc, argv, &stacks);
+	alloc_array(&stacks, size);
 	check_input_errors(argc, argv, &stacks);
 	check_numbers(&stacks);
 	fill_stack_a(&head_a, &stacks);
+	algorithmes(&head_a, &head_b, &stacks);
 	//print_stack_a(head_a);
 	//print_stack_b(head_b);
 	//ft_printf("Check stack size : %d\n", stack_size(head_a));
 	//check_sorted(&head_a);
-	algorithmes(&head_a, &head_b, &stacks);
-	check_sorted(&head_a);
-	print_stack_a(head_a);
+	//check_sorted(&head_a);
+	//print_stack_a(head_a);
 	//print_stack_b(head_b);
 	//ft_printf("Check stack size : %d\n", stack_size(head_a));
 	free_stack(head_a);

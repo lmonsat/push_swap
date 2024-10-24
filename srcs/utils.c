@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 00:40:10 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/11 19:39:05 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/24 21:14:15 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,19 +22,18 @@ int	ft_strcmp(char *s1, char *s2)
 	return (*s1 - *s2);
 }
 
-void alloc_array(struct s_stacks *value)
+void alloc_array(struct s_stacks *value, int size)
 {
 	int i;
 
 	i = 0;
-	value->numbers = malloc(1500 * sizeof(char *));
+	value->numbers = malloc(size * sizeof(char *));
 	if (value->numbers == NULL)
 	{
 		ft_printf("memory allocation failed\n");
 		exit(EXIT_FAILURE);
 	}
-
-	while (i < 1500)
+	while (i < size)
 	{
 		value->numbers[i] = NULL;
 		i++;

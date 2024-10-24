@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 17:15:03 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/24 05:20:59 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/24 17:31:57 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ struct s_stacks *create_node_a(int data)
 	new_node = malloc(sizeof(struct s_stacks));
 	if (new_node == NULL)
 	{
-		ft_printf("Error\n");
+		write(2, "Error\n", 6);
 		exit(EXIT_FAILURE);
 	}
     new_node->data = data;
