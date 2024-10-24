@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 00:37:27 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/24 21:14:59 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/24 21:29:43 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -463,6 +463,7 @@ int count_split_result(char *argv[], int size, int n)
 		size++;
 	}
 	free_array(tmp_ptr);
+	ft_printf("test size : %d\n", size);
 	return (size);
 }
 
