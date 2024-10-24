@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 17:15:03 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/23 16:43:14 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/24 05:20:59 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,30 +46,22 @@ struct s_stacks *pop_last(struct s_stacks **head)
 	struct s_stacks *current;
 	struct s_stacks *prev;
 
-	// Si la liste est vide, rien à supprimer
 	if (*head == NULL)
 		return (NULL);
 
 	current = *head;
-
-	// Si la liste n'a qu'un seul élément
 	if (current->next == NULL)
 	{
-		*head = NULL;  // La liste devient vide
+		*head = NULL;
 		return (current);
 	}
-
-	// Parcourir la liste jusqu'à l'avant-dernier élément
 	while (current->next)
 	{
 		prev = current;
 		current = current->next;
 	}
-
-	// Supprimer le dernier élément
 	prev->next = NULL;
 	current->prev = NULL;
-
 	return (current);
 }
 
@@ -77,7 +69,6 @@ void push_last(struct s_stacks **head, struct s_stacks *last)
 {
 	struct s_stacks *current;
 
-	// Si la liste est vide, le nouvel élément devient le premier
 	if (*head == NULL)
 	{
 		*head = last;
@@ -85,17 +76,12 @@ void push_last(struct s_stacks **head, struct s_stacks *last)
 		last->prev = NULL;
 		return;
 	}
-
 	current = *head;
-
-	// Parcourir jusqu'au dernier élément
 	while (current->next)
 	{
 		current = current->next;
 	}
-
-	// Ajouter le nouvel élément à la fin
 	current->next = last;
-	last->prev = current;  // Mettre à jour le pointeur prev
+	last->prev = current;
 	last->next = NULL;
 }

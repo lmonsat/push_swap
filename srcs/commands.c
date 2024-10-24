@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/01 18:17:36 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/18 22:06:43 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/24 05:21:47 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,6 @@ void rra(struct s_stacks **head, int is_rrr)
     struct s_stacks *last;
     struct s_stacks *second_last;
 
-    // Vérifie si la pile contient au moins deux éléments
     if (*head && (*head)->next)
     {
         last = *head;
@@ -184,7 +183,6 @@ void rrb(struct s_stacks **head, int is_rrr)
 	struct s_stacks *last;
     struct s_stacks *second_last;
 
-    // Vérifie si la pile contient au moins deux éléments
     if (*head && (*head)->next)
     {
         last = *head;

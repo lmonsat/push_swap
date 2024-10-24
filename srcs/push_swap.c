@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 00:37:27 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/23 21:41:54 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/24 05:25:51 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -282,34 +282,30 @@ void rotate_stack_a_and_b(struct s_stacks **stack_a, struct s_stacks **stack_b, 
 	update_position(*stack_b);
 }
 
-/*
- *	Best match is..
- *   | "The Smallest-bigger value" |
- *
- *  if no node is Bigger, best_match is the Smallest node.
- *  TLDR 
- *  With this function every node in b gets its target node in a
-*/
+/* Trouve le target_node dans le stack_a pour chaque élement de stack_b.
+
+	Le but étant de trouver un élement dans stack_a plus grand que celui de print_stack_b
+	mais le plus petit possible afin de maintenir la stack trié */
 void	set_target_node(struct s_stacks *stack_a, struct s_stacks *stack_b)
 {
 	struct s_stacks *current_a;
 	struct s_stacks *target_node;
-	long			best_match_index;
+	long target_value;
 
 	while (stack_b)
 	{
-		best_match_index = LONG_MAX;
+		target_value = LONG_MAX;
 		current_a = stack_a;
 		while (current_a)
 		{
-			if (current_a->data > stack_b->data && current_a->data < best_match_index)
+			if (current_a->data > stack_b->data && current_a->data < target_value)
 			{
-				best_match_index = current_a->data;
+				target_value = current_a->data;
 				target_node = current_a;
 			}
 			current_a = current_a->next;
 		}
-		if (LONG_MAX == best_match_index)
+		if (target_value == LONG_MAX)
 			stack_b->target_node = min_node_in_stack(stack_a);
 		else
 			stack_b->target_node = target_node;
@@ -317,12 +313,8 @@ void	set_target_node(struct s_stacks *stack_a, struct s_stacks *stack_b)
 	}
 }
 
-/*
- * Set the prices to push the node
- * from b -> a
- * The price checks for the relative positions in the stack
- * for every node, setting the respective price
-*/
+/* Calcule le coût total pour chaque élement de la stack_b pour l'amener
+	à la bonne position dans stack_a */
 void	set_cost(struct s_stacks *stack_a, struct s_stacks *stack_b)
 {
 	int	size_a;
@@ -334,11 +326,17 @@ void	set_cost(struct s_stacks *stack_a, struct s_stacks *stack_b)
 	{
 		stack_b->push_cost = stack_b->current_position;
 		if (!(stack_b->above_median))
+		{
 			stack_b->push_cost = size_b - (stack_b->current_position);
+		}
 		if (stack_b->target_node->above_median)
+		{
 			stack_b->push_cost += stack_b->target_node->current_position;
+		}
 		else
+		{
 			stack_b->push_cost += size_a - (stack_b->target_node->current_position);
+		}
 		stack_b = stack_b->next;
 	}
 }
@@ -457,7 +455,15 @@ void check_sorted(struct s_stacks **head)
 	}
 	ft_printf("is sorted\n");
 }
-
+/* Regler les problèmes d'algo 4 et 5
+	
+	Permettre l'allocation dynamique de l'array afin d'avoir des entrée nombres plus large
+	
+	Séparer les fonctions et les trier dans chaque fichier c
+	
+	Ajuster le fichier header
+	
+	Appliquer la norme */
 
 int main(int argc, char *argv[])
 {
