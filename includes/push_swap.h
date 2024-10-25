@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 00:38:03 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/24 21:06:37 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/25 15:09:58 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,8 @@ void rrr(struct s_stacks **head_a, struct s_stacks **head_b);
 
 void algo_2(struct s_stacks **head);
 void algo_3(struct s_stacks **head);
-void algo_4(struct s_stacks **head);
-void algo_5(struct s_stacks **head);
+void algo_4(struct s_stacks **head_a, struct s_stacks **head_b);
+void algo_5(struct s_stacks **head_a, struct s_stacks **head_b);
 
 void print_stack_a(struct s_stacks *current);
 void insert_head_a(struct s_stacks **head, int new_data);

@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 03:09:36 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/24 17:39:03 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/25 16:51:30 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,23 +21,26 @@ int	is_digit(int c)
 
 int	is_int(const char *str, struct s_stacks *stack)
 {
+	const char *temp_ptr;
+
+	temp_ptr = str;
 	stack->is_string_numbers = 0;
-	if (*str == '\0')
+	if (*temp_ptr == '\0')
 		return (0);
-	if (*str == '+' || *str == '-')
-		str++;
-	if (!*str)
+	if (*temp_ptr == '+' || *temp_ptr == '-')
+		temp_ptr++;
+	if (!*temp_ptr)
 		return (0);
-	while (*str)
+	while (*temp_ptr)
 	{
-		if (*str == ' ')
+		if (*temp_ptr == ' ')
 		{
 			stack->is_string_numbers = 1;
-			str++;
+			temp_ptr++;
 		}
-		if (!is_digit(*str))
+		if (!is_digit(*temp_ptr))
 			return (0);
-		str++;
+		temp_ptr++;
 	}
 	return (1);
 }

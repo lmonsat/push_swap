@@ -6,11 +6,30 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 00:37:27 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/24 21:29:43 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/25 17:29:44 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/push_swap.h"
+
+int is_sorted_arg(char *argv[])
+{
+	int i;
+
+	i = 0;
+	if (argv[0] && argv[1])
+	{
+		while (argv[i])
+		{
+			if (argv[i] > argv[i + 1])
+			{
+				return (0);
+			}
+			i++;
+		}
+	}
+	return (1);
+}
 
 void check_input_errors(int argc, char *argv[], struct s_stacks *stack)
 {
@@ -43,13 +62,13 @@ void check_input_errors(int argc, char *argv[], struct s_stacks *stack)
 	}
 }
 
-void arg_count(int argc)
+int arg_count(int argc)
 {
-	if (argc < 2)
+	if (argc == 1)
 	{
-		write(2, "Error\n", 6);
-		exit(EXIT_FAILURE);
+		return (0);
 	}
+	return (1);
 }
 
 void print_stack_a(struct s_stacks *current)
@@ -413,7 +432,7 @@ void rush_a(struct s_stacks **stack_a, struct s_stacks **stack_b)
 
 void algo_plus(struct s_stacks **stack_a, struct s_stacks **stack_b, struct s_stacks *value)
 {
-	if (is_sorted(stack_a))
+	if (!is_sorted(stack_a))
 	{
 		rush_b(stack_a, stack_b);
 		algo_3(stack_a);
@@ -435,13 +454,11 @@ void algorithmes(struct s_stacks **head_a, struct s_stacks **head_b, struct s_st
 	}
 	else if (value->numbers_in_stack == 4)
 	{
-		algo_4(head_a);
-		//algo_plus(head_a, head_b, value);
+		algo_4(head_a, head_b);
 	}
 	else if (value->numbers_in_stack == 5)
 	{
-		algo_5(head_a);
-		//algo_plus(head_a, head_b, value);
+		algo_5(head_a, head_b);
 	}
 	else
 	{
@@ -463,7 +480,6 @@ int count_split_result(char *argv[], int size, int n)
 		size++;
 	}
 	free_array(tmp_ptr);
-	ft_printf("test size : %d\n", size);
 	return (size);
 }
 
@@ -484,7 +500,6 @@ int arguments_size(int argc, char *argv[], struct s_stacks *stack)
 				{
 					size = count_split_result(argv, size, n);
 				}
-				stack->is_string_numbers = 0;
 			}
 		}
 	}
@@ -518,21 +533,27 @@ int main(int argc, char *argv[])
 
 	head_a = NULL;
 	head_b = NULL;
-	arg_count(argc);
+	if (!arg_count(argc))
+		return (0);
+
 	size = arguments_size(argc, argv, &stacks);
+	//stacks.is_string_numbers = 0;
+	//ft_printf("test size : %d", size);
+
 	alloc_array(&stacks, size);
 	check_input_errors(argc, argv, &stacks);
 	check_numbers(&stacks);
 	fill_stack_a(&head_a, &stacks);
 	algorithmes(&head_a, &head_b, &stacks);
+
 	//print_stack_a(head_a);
 	//print_stack_b(head_b);
 	//ft_printf("Check stack size : %d\n", stack_size(head_a));
 	//check_sorted(&head_a);
-	//check_sorted(&head_a);
 	//print_stack_a(head_a);
 	//print_stack_b(head_b);
 	//ft_printf("Check stack size : %d\n", stack_size(head_a));
+
 	free_stack(head_a);
 	free_stack(head_b);
 	free_array(stacks.numbers);

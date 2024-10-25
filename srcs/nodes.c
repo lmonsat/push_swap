@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 17:15:03 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/24 17:31:57 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/25 16:51:21 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ struct s_stacks *create_node_a(int data)
 		write(2, "Error\n", 6);
 		exit(EXIT_FAILURE);
 	}
+	ft_memset(new_node, 0, sizeof(struct s_stacks));
     new_node->data = data;
     new_node->next = NULL;
     new_node->prev = NULL;

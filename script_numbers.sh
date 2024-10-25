@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Les valeurs de départ
-nombres=(1 2 3 4)
+nombres=(1 2 3 4 5)
 
 # Fonction pour générer les permutations
 generate_permutations() {

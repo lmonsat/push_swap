@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 00:40:10 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/24 21:27:47 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/25 14:52:16 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,13 +27,14 @@ void alloc_array(struct s_stacks *value, int size)
 	int i;
 
 	i = 0;
+	//ft_printf("test size 2 : %d", size);
 	value->numbers = malloc((size + 1) * sizeof(char *));
 	if (value->numbers == NULL)
 	{
 		ft_printf("memory allocation failed\n");
 		exit(EXIT_FAILURE);
 	}
-	while (i < size)
+	while (i <= size)
 	{
 		value->numbers[i] = NULL;
 		i++;

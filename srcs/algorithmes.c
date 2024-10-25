@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 17:06:54 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/24 15:11:05 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/25 15:15:41 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,58 +48,56 @@ void algo_3(struct s_stacks **head)
 	}
 }
 
-void algo_4(struct s_stacks **head)
+void algo_4(struct s_stacks **head_a, struct s_stacks **head_b)
 {
-	int max;
+	int min;
 	struct s_stacks *last;
 	
-	max = max_in_stack(head);
-	if (!is_sorted(head))
+	min = min_in_stack(head_a);
+	if (!is_sorted(head_a))
 	{
-		if (max == (*head)->data)
+		if (min == (*head_a)->next->data)
 		{
-			ra(head, 0);
+			ra(head_a, 0);
 		}
-		else if (max == (*head)->next->data)
+		else if (min == (*head_a)->next->next->data)
 		{
-			sa(head, 0);
-			ra(head, 0);
+			rra(head_a, 0);
+			rra(head_a, 0);
 		}
-		else if (max == (*head)->next->next->data)
+		else if (min == (*head_a)->next->next->next->data)
 		{
-			//rra(head, 0);
-			rra(head, 0);
+			rra(head_a, 0);
 		}
-		last = pop_last(head);
-		algo_3(head);
-		push_last(head, last);
+		pb(head_a, head_b);
+		algo_3(head_a);
+		pa(head_a, head_b);
 	}
 }
 
-void algo_5(struct s_stacks **head)
+void algo_5(struct s_stacks **head_a, struct s_stacks **head_b)
 {
-	int max;
-	struct s_stacks *last;
+	int min;
 	
-	max = max_in_stack(head);
-	if (!is_sorted(head))
+	min = min_in_stack(head_a);
+	if (!is_sorted(head_a))
 	{
-		if (max == (*head)->data)
-			ra(head, 0);
-		else if (max == (*head)->next->data)
+		if (min == (*head_a)->next->data)
+			ra(head_a, 0);
+		else if (min == (*head_a)->next->next->data)
 		{
-			sa(head, 0);
-			ra(head, 0);
+			ra(head_a, 0);
+			ra(head_a, 0);
 		}
-		else if (max == (*head)->next->next->data)
+		else if (min == (*head_a)->next->next->next->data)
 		{
-			rra(head, 0);
-			rra(head, 0);
+			rra(head_a, 0);
+			rra(head_a, 0);
 		}
-		else if (max == (*head)->next->next->next->data)
-			rra(head, 0);
-		last = pop_last(head);
-		algo_4(head);
-		push_last(head, last);
+		else if (min == (*head_a)->next->next->next->next->data)
+			rra(head_a, 0);
+		pb(head_a, head_b);
+		algo_4(head_a, head_b);
+		pa(head_a, head_b);
 	}
 }
