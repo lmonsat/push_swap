@@ -6,7 +6,7 @@
 /*   By: lmonsat <lmonsat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/19 00:37:27 by lmonsat           #+#    #+#             */
-/*   Updated: 2024/10/25 17:29:44 by lmonsat          ###   ########.fr       */
+/*   Updated: 2024/10/27 23:26:21 by lmonsat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,9 @@ void check_input_errors(int argc, char *argv[], struct s_stacks *stack)
 		}
 		else
 		{
-			write(2, "Error\n", 6);
+			write(2, "Error\n", 6); // <------------------------------------ TLE
 			free_array(stack->numbers);
-			exit(EXIT_FAILURE);
+			exit(0); // <------------------------------------ TLE erreur avec exit(1)
 		}
 		i = string_numbers(argv, stack, n, i);
 	}
@@ -537,6 +537,7 @@ int main(int argc, char *argv[])
 		return (0);
 
 	size = arguments_size(argc, argv, &stacks);
+
 	//stacks.is_string_numbers = 0;
 	//ft_printf("test size : %d", size);
 
